@@ -11,8 +11,19 @@ jobs:
   update-flake-lock:
     runs-on: ubuntu-latest
     steps:
+      # https://stackoverflow.com/a/70249520/5408933
+      # https://github.com/orgs/community/discussions/26726
+      - name: Check if ssh_key available
+        id: secret-check
+        shell: bash
+        run: |
+          if [ "${{ secrets.ssh_key }}" != '' ]; then
+            echo "available=true" >> $GITHUB_OUTPUT;
+          else
+            echo "available=false" >> $GITHUB_OUTPUT;
+          fi
       - name: Setup SSH agent
-        if: ${{ secrets.ssh_key }}
+        if: ${{ steps.secret-check.outputs.available == 'true' }}
         uses: webfactory/ssh-agent@v0.8.0
         with:
           ssh-private-key: ${{ secrets.ssh_key }}
