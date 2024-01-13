@@ -1,0 +1,44 @@
+name: nix-flake-check
+on:
+  workflow_call:
+    inputs:
+      check_dev:
+        required: false
+        type: boolean
+        default: true
+    secrets:
+      ssh_key:
+        required: false
+
+jobs:
+  nix-flake-check:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+      # https://stackoverflow.com/a/70249520/5408933
+      # https://github.com/orgs/community/discussions/26726
+      - name: Check if ssh_key available
+        id: secret-check
+        shell: bash
+        run: |
+          if [ "${{ secrets.ssh_key }}" != '' ]; then
+            echo "available=true" >> $GITHUB_OUTPUT;
+          else
+            echo "available=false" >> $GITHUB_OUTPUT;
+          fi
+      - name: Setup SSH agent
+        if: ${{ steps.secret-check.outputs.available == 'true' }}
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.ssh_key }}
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Install Nix
+        uses: cachix/install-nix-action@v24
+      - name: Flake Check Dev
+        if: ${{ inputs.check_dev }}
+        run: nix flake check "./?dir=dev&submodules=1"
+      - name: Flake Check
+        run: nix flake check
