@@ -6,6 +6,10 @@ on:
         required: false
         type: boolean
         default: true
+      cache:
+        required: false
+        type: boolean
+        default: false
     secrets:
       ssh_key:
         required: false
@@ -36,7 +40,15 @@ jobs:
         with:
           submodules: recursive
       - name: Install Nix
-        uses: cachix/install-nix-action@v26
+        uses: nixbuild/nix-quick-install-action@v27
+      - name: Restore and cache Nix store
+        uses: nix-community/cache-nix-action@v5
+        with:
+           # restore and save a cache using this key
+           primary-key: nix-${{ runner.os }}-${{ hashFiles('**/*.nix') }}
+           # if there's no cache hit, restore a cache by this prefix
+           restore-prefixes-first-match: nix-${{ runner.os }}-
+        if: ${{ inputs.cache }}
       - name: Flake Check Dev
         if: ${{ inputs.check_dev }}
         run: nix flake check "./?dir=dev&submodules=1"
