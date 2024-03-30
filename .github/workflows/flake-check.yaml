@@ -10,13 +10,17 @@ on:
         required: false
         type: boolean
         default: false
+      timeout-minutes:
+        required: false
+        type: number
+        default: 10
     secrets:
       ssh_key:
         required: false
 
 jobs:
   nix-flake-check:
-    timeout-minutes: 10
+    timeout-minutes: ${{ inputs.timeout-minutes }}
     runs-on: ubuntu-latest
     steps:
       # https://stackoverflow.com/a/70249520/5408933
