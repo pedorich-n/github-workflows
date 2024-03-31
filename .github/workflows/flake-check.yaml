@@ -50,8 +50,8 @@ jobs:
         with:
            # restore and save a cache using this key
            primary-key: nix-${{ runner.os }}-${{ hashFiles('**/*.nix') }}
-           # if there's no cache hit, restore a cache by this prefix. Searches across different branches
-           restore-prefixes-all-matches: nix-${{ runner.os }}-
+           # if there's no cache hit, restore a cache by this prefix
+           restore-prefixes-first-match: nix-${{ runner.os }}-
         if: ${{ inputs.cache }}
       - name: Flake Check Dev
         if: ${{ inputs.check_dev }}
