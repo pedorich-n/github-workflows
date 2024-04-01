@@ -45,6 +45,9 @@ jobs:
           submodules: recursive
       - name: Install Nix
         uses: nixbuild/nix-quick-install-action@v27
+        with:
+          nix_conf: |
+            system-features = nixos-test benchmark big-parallel uid-range kvm
       - name: Restore and cache Nix store
         uses: nix-community/cache-nix-action@v5
         with:
