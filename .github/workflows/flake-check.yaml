@@ -44,7 +44,7 @@ jobs:
         with:
           submodules: recursive
       - name: Install Nix
-        uses: nixbuild/nix-quick-install-action@v28
+        uses: nixbuild/nix-quick-install-action@v29
         with:
           nix_conf: |
             system-features = nixos-test benchmark big-parallel uid-range kvm
