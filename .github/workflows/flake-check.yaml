@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setup job
-        uses: pedorich-n/github-workflows/.github/actions/setup-nix-job.yaml@composite-actions
+        uses: pedorich-n/github-workflows/.github/actions/setup-nix-job@composite-actions
         with:
           ssh_key: ${{ secrets.ssh_key }}
       - name: Restore and cache Nix store
