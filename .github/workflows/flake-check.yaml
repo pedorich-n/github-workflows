@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - composite-actions
+  workflow_dispatch:
   workflow_call:
     inputs:
       check_dev:
