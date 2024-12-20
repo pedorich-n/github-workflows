@@ -1,5 +1,6 @@
 name: Nix Flake Check
 on:
+  workflow_dispatch: # allows manual triggering
   workflow_call:
     inputs:
       check_dev:
@@ -24,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setup job
-        uses: ./.github/actions/setup-nix-job.yaml
+        uses: pedorich-n/github-workflows/.github/actions/setup-nix-job.yaml@composite-actions
         with:
           ssh_key: ${{ secrets.ssh_key }}
       - name: Restore and cache Nix store
