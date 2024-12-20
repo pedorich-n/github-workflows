@@ -20,34 +20,13 @@ on:
 
 jobs:
   nix-flake-check:
-    timeout-minutes: ${{ inputs.timeout-minutes }}
+    # timeout-minutes: ${{ inputs.timeout-minutes }}
     runs-on: ubuntu-latest
     steps:
-      # https://stackoverflow.com/a/70249520/5408933
-      # https://github.com/orgs/community/discussions/26726
-      - name: Check if ssh_key available
-        id: secret-check
-        shell: bash
-        run: |
-          if [ "${{ secrets.ssh_key }}" != '' ]; then
-            echo "available=true" >> $GITHUB_OUTPUT;
-          else
-            echo "available=false" >> $GITHUB_OUTPUT;
-          fi
-      - name: Setup SSH agent
-        if: ${{ steps.secret-check.outputs.available == 'true' }}
-        uses: webfactory/ssh-agent@v0.9.0
+      - name: Setup job
+        uses: pedorich-n/github-workflows/.github/actions/setup-nix-job@main
         with:
-          ssh-private-key: ${{ secrets.ssh_key }}
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - name: Install Nix
-        uses: nixbuild/nix-quick-install-action@v29
-        with:
-          nix_conf: |
-            system-features = nixos-test benchmark big-parallel uid-range kvm
+          ssh_key: ${{ secrets.ssh_key }}
       - name: Restore and cache Nix store
         uses: nix-community/cache-nix-action@v5
         with:
