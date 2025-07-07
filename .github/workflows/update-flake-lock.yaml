@@ -16,7 +16,7 @@ jobs:
         with:
           ssh_key: ${{ secrets.ssh_key }}
       - name: Update flake.lock
-        uses: DeterminateSystems/update-flake-lock@v24
+        uses: DeterminateSystems/update-flake-lock@v26
         with:
           token: ${{ secrets.gh_access_token }}
           branch: update_flake_lock_action
