@@ -23,7 +23,7 @@ runs:
 
     - name: Setup SSH agent
       if: ${{ steps.ssh-key-check.outputs.available == 'true' }}
-      uses: webfactory/ssh-agent@v0.9
+      uses: webfactory/ssh-agent@v0.9.2
       with:
         ssh-private-key: ${{ inputs.ssh_key }}
 
