@@ -2,14 +2,6 @@ name: Nix Flake Check
 on:
   workflow_call:
     inputs:
-      check_dev:
-        required: false
-        type: boolean
-        default: true
-      cache:
-        required: false
-        type: boolean
-        default: false
       timeout-minutes:
         required: false
         type: number
@@ -20,23 +12,12 @@ on:
 
 jobs:
   nix-flake-check:
-    # timeout-minutes: ${{ inputs.timeout-minutes }}
+    timeout-minutes: ${{ inputs.timeout-minutes }}
     runs-on: ubuntu-latest
     steps:
       - name: Setup job
         uses: pedorich-n/github-workflows/.github/actions/setup-nix-job@main
         with:
           ssh_key: ${{ secrets.ssh_key }}
-      - name: Restore and cache Nix store
-        uses: nix-community/cache-nix-action@v6
-        with:
-           # restore and save a cache using this key
-           primary-key: nix-${{ runner.os }}-${{ hashFiles('**/*.nix') }}
-           # if there's no cache hit, restore a cache by this prefix
-           restore-prefixes-first-match: nix-${{ runner.os }}-
-        if: ${{ inputs.cache }}
-      - name: Flake Check Dev
-        if: ${{ inputs.check_dev }}
-        run: nix flake check "./?dir=dev&submodules=1"
       - name: Flake Check
         run: nix flake check
