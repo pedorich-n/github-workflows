@@ -9,6 +9,7 @@ on:
       nix_version:
         required: false
         type: string
+        default: '2.28.4'
     secrets:
       ssh_key:
         required: false
