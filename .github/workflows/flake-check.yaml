@@ -6,6 +6,9 @@ on:
         required: false
         type: number
         default: 10
+      nix_version:
+        required: false
+        type: string
     secrets:
       ssh_key:
         required: false
@@ -19,5 +22,6 @@ jobs:
         uses: pedorich-n/github-workflows/.github/actions/setup-nix-job@main
         with:
           ssh_key: ${{ secrets.ssh_key }}
+          nix_version: ${{ inputs.nix_version }}
       - name: Flake Check
         run: nix flake check

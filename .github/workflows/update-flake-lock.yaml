@@ -1,6 +1,10 @@
 name: Update flake.lock
 on:
   workflow_call:
+    inputs:
+      nix_version:
+        required: false
+        type: string
     secrets:
       gh_access_token:
         required: true
@@ -15,6 +19,7 @@ jobs:
         uses: pedorich-n/github-workflows/.github/actions/setup-nix-job@main
         with:
           ssh_key: ${{ secrets.ssh_key }}
+          nix_version: ${{ inputs.nix_version }}
       - name: Update flake.lock
         uses: DeterminateSystems/update-flake-lock@v27
         with:
