@@ -39,5 +39,6 @@ runs:
     - name: Install Nix
       uses: nixbuild/nix-quick-install-action@v32
       with:
+        nix_version: ${{ inputs.nix_version }}
         nix_conf: |
           system-features = nixos-test benchmark big-parallel uid-range kvm
