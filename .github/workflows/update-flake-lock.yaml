@@ -22,7 +22,7 @@ jobs:
           ssh_key: ${{ secrets.ssh_key }}
           nix_version: ${{ inputs.nix_version }}
       - name: Update flake.lock
-        uses: DeterminateSystems/update-flake-lock@v27
+        uses: DeterminateSystems/update-flake-lock@c5930b397a673a70ca70be06020e943aeac310a1 # v27
         with:
           token: ${{ secrets.gh_access_token }}
           branch: update_flake_lock_action

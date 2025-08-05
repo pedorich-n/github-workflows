@@ -27,17 +27,17 @@ runs:
 
     - name: Setup SSH agent
       if: ${{ steps.ssh-key-check.outputs.available == 'true' }}
-      uses: webfactory/ssh-agent@v0.9.1
+      uses: webfactory/ssh-agent@a6f90b1f127823b31d4d4a8d96047790581349bd # v0.9.1
       with:
         ssh-private-key: ${{ inputs.ssh_key }}
 
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       with:
         submodules: recursive
 
     - name: Install Nix
-      uses: nixbuild/nix-quick-install-action@v32
+      uses: nixbuild/nix-quick-install-action@63ca48f939ee3b8d835f4126562537df0fee5b91 # v32
       with:
         nix_version: ${{ inputs.nix_version }}
         nix_conf: |
