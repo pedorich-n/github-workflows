@@ -2,7 +2,7 @@ name: Nix Flake Check
 on:
   workflow_call:
     inputs:
-      timeout-minutes:
+      timeout_minutes:
         required: false
         type: number
         default: 10
@@ -16,7 +16,7 @@ on:
 
 jobs:
   nix-flake-check:
-    timeout-minutes: ${{ inputs.timeout-minutes }}
+    timeout-minutes: ${{ inputs.timeout_minutes }}
     runs-on: ubuntu-latest
     steps:
       - name: Setup job
