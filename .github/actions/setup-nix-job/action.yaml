@@ -36,9 +36,17 @@ runs:
         ssh-private-key: ${{ inputs.ssh_key }}
 
     - name: Rewrite SSH → HTTPS git URLs
-      uses: ./.github/actions/git-url-rewrite
-      with:
-        token: ${{ inputs.git_https_token }}
+      shell: bash
+      run: |
+        git config --global url."https://github.com/".insteadOf "git@github.com:"
+        git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
+
+    - name: Setup credential helper for token authentication
+      if: ${{ inputs.token }}
+      shell: bash
+      run: |
+        git config --global credential.helper "store --file=$HOME/.git-credentials"
+        echo "https://x-access-token:${{ inputs.token }}@github.com" > $HOME/.git-credentials
 
     - name: Checkout repository
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
