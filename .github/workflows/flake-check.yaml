@@ -16,8 +16,6 @@ on:
         description: Github Access Token to rewrite git URLs to use HTTPS with
           authentication. If not provided, it will rewrite to standard HTTPS
           URLs without authentication.
-      ssh_key:
-        required: false
 
 jobs:
   nix-flake-check:
@@ -27,7 +25,6 @@ jobs:
       - name: Setup job
         uses: pedorich-n/github-workflows/.github/actions/setup-nix-job@main
         with:
-          ssh_key: ${{ secrets.ssh_key }}
           nix_version: ${{ inputs.nix_version }}
           git_https_token: ${{ secrets.git_https_token }}
       - name: Flake Check
