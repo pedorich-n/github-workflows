@@ -42,11 +42,11 @@ runs:
         git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
 
     - name: Setup credential helper for token authentication
-      if: ${{ inputs.token }}
+      if: ${{ inputs.git_https_token }}
       shell: bash
       run: |
         git config --global credential.helper "store --file=$HOME/.git-credentials"
-        echo "https://x-access-token:${{ inputs.token }}@github.com" > $HOME/.git-credentials
+        echo "https://x-access-token:${{ inputs.git_https_token }}@github.com" > $HOME/.git-credentials
 
     - name: Checkout repository
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
