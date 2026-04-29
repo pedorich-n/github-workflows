@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setup job
-        uses: pedorich-n/github-workflows/.github/actions/setup-nix-job@https-instead-of-ssh
+        uses: pedorich-n/github-workflows/.github/actions/setup-nix-job@main
         with:
           ssh_key: ${{ secrets.ssh_key }}
           nix_version: ${{ inputs.nix_version }}
