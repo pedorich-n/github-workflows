@@ -7,8 +7,11 @@ on:
         type: string
         default: ""
     secrets:
-      gh_access_token:
-        required: true
+      git_https_token:
+        required: false
+        description: Github Access Token to rewrite git URLs to use HTTPS with
+          authentication. If not provided, it will rewrite to standard HTTPS
+          URLs without authentication.
       ssh_key:
         required: false
 
@@ -17,14 +20,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setup job
-        uses: pedorich-n/github-workflows/.github/actions/setup-nix-job@main
+        uses: ./.github/actions/setup-nix-job
         with:
           ssh_key: ${{ secrets.ssh_key }}
           nix_version: ${{ inputs.nix_version }}
+          git_https_token: ${{ secrets.git_https_token }}
       - name: Update flake.lock
         uses: DeterminateSystems/update-flake-lock@834c491b2ece4de0bbd00d85214bb5e83b4da5c6 # v28
         with:
-          token: ${{ secrets.gh_access_token }}
           branch: update_flake_lock_action
           pr-title: "Update flake.lock"
           pr-labels: |
