@@ -1,0 +1,52 @@
+name: Get a Github App token
+description: An action to get a Github App token and App user info
+inputs:
+  app_id:
+    description: The Github App ID to authenticate with
+    required: true
+  private_key:
+    description: The private key of the Github App, in PEM format.
+    required: true
+outputs:
+  token:
+    description: The generated Github App token
+    value: ${{ steps.app-token.outputs.token }}
+  user_name:
+    description: The username of the Github App user associated with the token
+    value: ${{ steps.app-user.outputs.user-name }}
+  user_id:
+    description: The user ID of the Github App user associated with the token
+    value: ${{ steps.app-user.outputs.user-id }}
+  user_email:
+    description: The email of the Github App user associated with the token
+    value: ${{ steps.app-user.outputs.user-email }}
+  committer:
+    description: The committer information of the Github App user associated with the token
+    value: ${{ steps.app-user.outputs.committer }}
+
+runs:
+  using: composite
+  steps:
+    - name: Get token
+      id: app-token
+      uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3
+      with:
+        client-id: ${{ inputs.app_id }}
+        private-key: ${{ inputs.private_key }}
+
+    # From: https://github.com/actions/create-github-app-token#configure-git-cli-for-an-apps-bot-user
+    - name: Get GitHub App User Info
+      id: app-user
+      shell: bash
+      env:
+        GH_TOKEN: ${{ steps.app-token.outputs.token }}
+      run: |
+        USER_NAME="${{ steps.app-token.outputs.app-slug }}[bot]"
+        USER_ID="$(gh api "/users/$USER_NAME" --jq .id)"
+        USER_EMAIL="${USER_ID}+${USER_NAME}@users.noreply.github.com"
+        {
+          echo "user-id=$USER_ID"
+          echo "user-name=$USER_NAME"
+          echo "user-email=$USER_EMAIL"
+          echo "committer=$USER_NAME <$USER_EMAIL>"
+        } >> "$GITHUB_OUTPUT"
