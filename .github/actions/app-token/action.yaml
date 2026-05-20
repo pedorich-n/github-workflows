@@ -1,10 +1,10 @@
 name: Get a Github App token
 description: An action to get a Github App token and App user info
 inputs:
-  app_id:
-    description: The Github App ID to authenticate with
+  client-id:
+    description: The Github App ClientID to authenticate with
     required: true
-  private_key:
+  private-key:
     description: The private key of the Github App, in PEM format.
     required: true
 outputs:
@@ -31,8 +31,8 @@ runs:
       id: app-token
       uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3
       with:
-        client-id: ${{ inputs.app_id }}
-        private-key: ${{ inputs.private_key }}
+        client-id: ${{ inputs.client-id }}
+        private-key: ${{ inputs.private-key }}
 
     # From: https://github.com/actions/create-github-app-token#configure-git-cli-for-an-apps-bot-user
     - name: Get GitHub App User Info
