@@ -12,17 +12,52 @@ on:
         description: Github Access Token to rewrite git URLs to use HTTPS with
           authentication. If not provided, it will rewrite to standard HTTPS
           URLs without authentication.
+      client_id:
+        description: The Github App ClientID to authenticate with. If provided, it will
+          be used to generate a token for git authentication. If not provided,
+          it will fall back to using the `git_https_token` secret for
+          authentication.
+        required: false
+      private_key:
+        description: The private key of the Github App, in PEM format. If provided, it
+          will be used to generate a token for git authentication. If not
+          provided, it will fall back to using the `git_https_token` secret for
+          authentication.
+        required: false
 
 jobs:
   update-flake-lock:
     runs-on: ubuntu-latest
     steps:
+      - name: Get Github App info
+        if: ${{ inputs.client_id && inputs.private_key }}
+        id: app-auth
+        uses: pedorich-n/github-workflows/.github/actions/app-token@223a30a40b4763eb404ee9c349cf9a9ae7c346fd # main
+        with:
+          client-id: ${{ inputs.client_id }}
+          private-key: ${{ inputs.private_key }}
+
       - name: Setup job
-        uses: pedorich-n/github-workflows/.github/actions/setup-nix-job@0ac01737358c2e47e10d7aff49a8568c0e6d58a3 # main
+        uses: pedorich-n/github-workflows/.github/actions/setup-nix-job@223a30a40b4763eb404ee9c349cf9a9ae7c346fd # main
         with:
           nix_version: ${{ inputs.nix_version }}
-          git_https_token: ${{ secrets.git_https_token }}
-      - name: Update flake.lock
+          git_https_token: ${{ steps.app-auth.outputs.token || secrets.git_https_token }}
+
+      - name: Update flake.lock (using Github App)
+        if: ${{ steps.app-auth.outputs.token }}
+        uses: DeterminateSystems/update-flake-lock@834c491b2ece4de0bbd00d85214bb5e83b4da5c6 # v28
+        with:
+          token: ${{ steps.app-auth.outputs.token }}
+          branch: update_flake_lock_action
+          git-commit-name: ${{ steps.app-auth.outputs.user-name }}
+          git-commit-email: ${{ steps.app-auth.outputs.user-email }}
+          pr-title: "Update flake.lock"
+          pr-labels: |
+            dependencies
+            automated
+
+      - name: Update flake.lock (without token)
+        if: ${{ !steps.app-auth.outputs.token }}
         uses: DeterminateSystems/update-flake-lock@834c491b2ece4de0bbd00d85214bb5e83b4da5c6 # v28
         with:
           branch: update_flake_lock_action

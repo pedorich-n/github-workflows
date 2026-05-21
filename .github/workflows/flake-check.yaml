@@ -16,16 +16,37 @@ on:
         description: Github Access Token to rewrite git URLs to use HTTPS with
           authentication. If not provided, it will rewrite to standard HTTPS
           URLs without authentication.
+      client_id:
+        description: The Github App ClientID to authenticate with. If provided, it will
+          be used to generate a token for git authentication. If not provided,
+          it will fall back to using the `git_https_token` secret for
+          authentication.
+        required: false
+      private_key:
+        description: The private key of the Github App, in PEM format. If provided, it
+          will be used to generate a token for git authentication. If not
+          provided, it will fall back to using the `git_https_token` secret for
+          authentication.
+        required: false
 
 jobs:
   nix-flake-check:
     timeout-minutes: ${{ inputs.timeout_minutes }}
     runs-on: ubuntu-latest
     steps:
-      - name: Setup job
-        uses: pedorich-n/github-workflows/.github/actions/setup-nix-job@0ac01737358c2e47e10d7aff49a8568c0e6d58a3 # main
+      - name: Get Github App info
+        if: ${{ inputs.client_id && inputs.private_key }}
+        id: app-auth
+        uses: pedorich-n/github-workflows/.github/actions/app-token@223a30a40b4763eb404ee9c349cf9a9ae7c346fd # main
+        with:
+          client-id: ${{ inputs.client_id }}
+          private-key: ${{ inputs.private_key }}
+
+      - name: Setup Nix
+        uses: pedorich-n/github-workflows/.github/actions/setup-nix-job@223a30a40b4763eb404ee9c349cf9a9ae7c346fd # main
         with:
           nix_version: ${{ inputs.nix_version }}
-          git_https_token: ${{ secrets.git_https_token }}
-      - name: Flake Check
-        run: nix flake check
+          git_https_token: ${{ steps.app-auth.outputs.token || secrets.git_https_token }}
+
+      - name: Nix Flake Check
+        uses: pedorich-n/github-workflows/.github/actions/nix-flake-check@223a30a40b4763eb404ee9c349cf9a9ae7c346fd # main
