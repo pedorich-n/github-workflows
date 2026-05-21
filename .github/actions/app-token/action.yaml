@@ -7,6 +7,15 @@ inputs:
   private_key:
     description: The private key of the Github App, in PEM format.
     required: true
+  owner:
+    description: If provided, the token will be issued for all repositories in the
+      owner (user or organization). If not provided, the token will be issued
+      for the repository of the workflow that calls this action.
+    required: false
+  repositories:
+    description: Comma or newline-separated list of repositories to grant the token
+      access to (defaults to current repository if owner is unset)
+    required: false
 outputs:
   token:
     description: The generated Github App token
@@ -33,6 +42,8 @@ runs:
       with:
         client-id: ${{ inputs.client_id }}
         private-key: ${{ inputs.private_key }}
+        owner: ${{ inputs.owner }}
+        repositories: ${{ inputs.repositories }}
 
     # From: https://github.com/actions/create-github-app-token#configure-git-cli-for-an-apps-bot-user
     - name: Get GitHub App User Info

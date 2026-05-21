@@ -18,6 +18,19 @@ on:
         required: false
         type: string
         default: ""
+      app_owner:
+        description: If provided, the token will be issued for all repositories in the
+          owner (user or organization). If not provided, the token will be issued
+          for the repository of the workflow that calls this action.
+        required: false
+        type: string
+        default: ""
+      app_repositories:
+        description: Comma or newline-separated list of repositories to grant the token
+          access to (defaults to current repository if owner is unset)
+        required: false
+        type: string
+        default: ""
     secrets:
       git_https_token:
         required: false
@@ -43,6 +56,8 @@ jobs:
         with:
           client_id: ${{ inputs.app_client_id }}
           private_key: ${{ secrets.app_private_key }}
+          owner: ${{ inputs.app_owner }}
+          repositories: ${{ inputs.app_repositories }}
 
       - name: Setup Nix
         uses: pedorich-n/github-workflows/.github/actions/setup-nix-job@rework-flows # main
