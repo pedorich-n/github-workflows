@@ -10,18 +10,20 @@ on:
         required: false
         type: string
         default: ""
-    secrets:
-      git_https_token:
-        required: false
-        description: Github Access Token to rewrite git URLs to use HTTPS with
-          authentication. If not provided, it will rewrite to standard HTTPS
-          URLs without authentication.
       app_client_id:
         description: The Github App ClientID to authenticate with. If provided, it will
           be used to generate a token for git authentication. If not provided,
           it will fall back to using the `git_https_token` secret for
           authentication.
         required: false
+        type: string
+        default: ""
+    secrets:
+      git_https_token:
+        required: false
+        description: Github Access Token to rewrite git URLs to use HTTPS with
+          authentication. If not provided, it will rewrite to standard HTTPS
+          URLs without authentication.
       app_private_key:
         description: The private key of the Github App, in PEM format. If provided, it
           will be used to generate a token for git authentication. If not
@@ -35,11 +37,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Get Github App info
-        if: ${{ secrets.app_client_id && secrets.app_private_key }}
+        if: ${{ inputs.app_client_id != '' }}
         id: app-auth
         uses: pedorich-n/github-workflows/.github/actions/app-token@rework-flows # main
         with:
-          client_id: ${{ secrets.app_client_id }}
+          client_id: ${{ inputs.app_client_id }}
           private_key: ${{ secrets.app_private_key }}
 
       - name: Setup Nix
