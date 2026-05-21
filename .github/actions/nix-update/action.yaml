@@ -14,7 +14,7 @@ inputs:
     description: GitHub token for creating pull requests
     required: false
     default: ${{ github.token }}
-  comitter:
+  committer:
     description: Name and email for the git committer
     required: false
     default: |
@@ -41,7 +41,7 @@ runs:
         nix shell nixpkgs#nix-update --command bash << 'SCRIPT'
           set -euo pipefail
 
-          IFS=',' read -ra packages <<< "${PACKAGES//$'\n'/,}"
+          IFS=$'\n' readarray -t packages < <(printf '%s' "${PACKAGES//,/$'\n'}" | xargs -n1)
 
           for pkg in "${packages[@]}"; do
             echo "Updating package: $pkg"
@@ -82,7 +82,7 @@ runs:
       uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8
       with:
         token: ${{ inputs.token }}
-        committer: ${{ inputs.comitter }}
+        committer: ${{ inputs.committer }}
         author: ${{ inputs.author }}
         commit-message: "Updated ${{ steps.summary.outputs.count }} package(s)"
         title: "Update package(s) using nix-update"
