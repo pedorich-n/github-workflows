@@ -10,6 +10,20 @@ inputs:
     description: A newline or comma-separated list of packages to update (e.g.
       "package1,package2")
     required: true
+  token:
+    description: GitHub token for creating pull requests
+    required: false
+    default: ${{ github.token }}
+  comitter:
+    description: Name and email for the git committer
+    required: false
+    default: |
+      github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
+  author:
+    description: Name and email for the git author
+    required: false
+    default: |
+      github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
 
 runs:
   using: composite
@@ -57,9 +71,19 @@ runs:
           echo "__EOF__"
         } >> "$GITHUB_OUTPUT"
 
+    - name: Check for changes
+      id: git-check
+      shell: bash
+      run: |
+        git diff --quiet || echo "changes_detected=true" >> "$GITHUB_OUTPUT"
+
     - name: Create pull request
+      if: steps.git-check.outputs.changes_detected
       uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8
       with:
+        token: ${{ inputs.token }}
+        committer: ${{ inputs.comitter }}
+        author: ${{ inputs.author }}
         commit-message: "Updated ${{ steps.summary.outputs.count }} package(s)"
         title: "Update package(s) using nix-update"
         body: ${{ steps.summary.outputs.summary }}
