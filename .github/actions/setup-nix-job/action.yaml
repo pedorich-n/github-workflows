@@ -23,9 +23,11 @@ runs:
     - name: Setup credential helper for token authentication
       if: ${{ inputs.git_https_token }}
       shell: bash
+      env:
+        GIT_HTTPS_TOKEN: ${{ inputs.git_https_token }}
       run: |
         git config --global credential.helper "store --file=$HOME/.git-credentials"
-        echo "https://x-access-token:${{ inputs.git_https_token }}@github.com" > $HOME/.git-credentials
+        echo "https://x-access-token:${GIT_HTTPS_TOKEN}@github.com" > $HOME/.git-credentials
 
     - name: Checkout repository
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
@@ -37,12 +39,7 @@ runs:
       if: ${{ inputs.nix_version != '' }}
       with:
         nix_version: ${{ inputs.nix_version }}
-        nix_conf: |
-          system-features = nixos-test benchmark big-parallel uid-range kvm
 
     - name: Install Nix (latest stable)
       uses: nixbuild/nix-quick-install-action@2c9db80fb984ceb1bcaa77cdda3fdf8cfba92035 # v34
       if: ${{ inputs.nix_version == '' }}
-      with:
-        nix_conf: |
-          system-features = nixos-test benchmark big-parallel uid-range kvm
