@@ -1,0 +1,58 @@
+name: Run nix flake check
+description: An action to run `nix flake check` on the repository
+inputs:
+  args:
+    description: Extra arguments to pass to nix flake check
+    required: false
+    default: "--print-build-logs"
+
+outputs:
+  success:
+    description: Whether nix flake check passed
+    value: ${{ steps.nix-flake-check.outputs.success }}
+
+runs:
+  using: composite
+  steps:
+    - name: Nix Flake Check
+      id: nix-flake-check
+      shell: bash
+      env:
+        ARGS: ${{ inputs.args }}
+      run: |
+        set +e
+
+        log_file="/tmp/flake-check.log"
+        nix flake check $ARGS 2>&1 | tee "$log_file"
+        exit_code=${PIPESTATUS[0]}
+        echo "success=$([[ $exit_code -eq 0 ]] && echo 'true' || echo 'false')" >> "$GITHUB_OUTPUT"
+
+        cutoff_size=500000
+        file_size=$(wc -c < "$log_file")
+
+        {
+          echo "## Nix Flake Check"
+          if [[ $exit_code -eq 0 ]]; then
+            echo "✅ **Passed**"
+          else
+            echo "❌ **Failed**"
+          fi
+
+          echo ""
+
+          if [[ $file_size -gt $cutoff_size ]]; then
+            echo "> [!WARNING]"
+            echo "> Log truncated to last ${cutoff_size} bytes"
+            echo ""
+          fi
+
+          echo "<details><summary>Click to view logs</summary>"
+          echo ""
+          echo '```text'
+          # Strip ANSI escape codes and truncate to the last $cutoff_size bytes
+          sed -E 's/\x1B\[[0-9;]*[a-zA-Z]//g' "$log_file" | tail -c $cutoff_size
+          echo '```'
+          echo "</details>"
+        } >> "$GITHUB_STEP_SUMMARY"
+
+        exit $exit_code
