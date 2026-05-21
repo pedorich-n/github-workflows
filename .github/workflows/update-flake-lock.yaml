@@ -32,13 +32,13 @@ jobs:
       - name: Get Github App info
         if: ${{ secrets.app_client_id && secrets.app_private_key }}
         id: app-auth
-        uses: pedorich-n/github-workflows/.github/actions/app-token@223a30a40b4763eb404ee9c349cf9a9ae7c346fd # main
+        uses: pedorich-n/github-workflows/.github/actions/app-token@rework-flows # main
         with:
-          client-id: ${{ secrets.app_client_id }}
-          private-key: ${{ secrets.app_private_key }}
+          client_id: ${{ secrets.app_client_id }}
+          private_key: ${{ secrets.app_private_key }}
 
       - name: Setup job
-        uses: pedorich-n/github-workflows/.github/actions/setup-nix-job@223a30a40b4763eb404ee9c349cf9a9ae7c346fd # main
+        uses: pedorich-n/github-workflows/.github/actions/setup-nix-job@rework-flows # main
         with:
           nix_version: ${{ inputs.nix_version }}
           git_https_token: ${{ steps.app-auth.outputs.token || secrets.git_https_token }}
