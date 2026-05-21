@@ -1,0 +1,65 @@
+name: Run nix-update
+description: An action to run `nix-update` for given packages and create a pull
+  request if updates are found
+inputs:
+  args:
+    description: Extra arguments to pass to nix-update
+    required: false
+    default: "--flake"
+  packages:
+    description: A newline or comma-separated list of packages to update (e.g.
+      "package1,package2")
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Run nix-update
+      id: nix-update
+      shell: bash
+      env:
+        ARGS: ${{ inputs.args }}
+        PACKAGES: ${{ inputs.packages }}
+      run: |
+        export updated_packages_dir="/tmp/nix-updated-packages"
+        mkdir -p "$updated_packages_dir"
+
+        nix shell nixpkgs#nix-update --command bash << 'SCRIPT'
+          set -euo pipefail
+
+          IFS=',' read -ra packages <<< "${PACKAGES//$'\n'/,}"
+
+          for pkg in "${packages[@]}"; do
+            echo "Updating package: $pkg"
+            nix-update $ARGS --write-commit-message="${updated_packages_dir}/$pkg" "$pkg"
+          done
+        SCRIPT
+
+    - name: Generate update summary
+      id: summary
+      shell: bash
+      run: |
+        updated_packages_dir="/tmp/nix-updated-packages"
+
+        mapfile -t updated_files < <(find "$updated_packages_dir" -maxdepth 1 -type f | sort)
+        num_updated=${#updated_files[@]}
+
+        echo "count=${num_updated}" >> "$GITHUB_OUTPUT"
+        {
+          echo "summary<<__EOF__"
+          echo "# Updated ${num_updated} packages"
+          for f in "${updated_files[@]}"; do
+            pkg=$(basename "$f")
+            printf '\n## %s\n\n' "$pkg"
+            cat "$f"
+            printf '\n\n'
+          done
+          echo "__EOF__"
+        } >> "$GITHUB_OUTPUT"
+
+    - name: Create pull request
+      uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8
+      with:
+        commit-message: "Updated ${{ steps.summary.outputs.count }} package(s)"
+        title: "Update package(s) using nix-update"
+        body: ${{ steps.summary.outputs.summary }}
