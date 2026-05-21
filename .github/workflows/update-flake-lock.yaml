@@ -57,8 +57,8 @@ jobs:
         with:
           token: ${{ steps.app_auth.outputs.token }}
           branch: update_flake_lock_action
-          git-commit-name: ${{ steps.app_auth.outputs.user-name }}
-          git-commit-email: ${{ steps.app_auth.outputs.user-email }}
+          git-commiter-name: ${{ steps.app_auth.outputs.user-name }}
+          git-commiter-email: ${{ steps.app_auth.outputs.user-email }}
           pr-title: "Update flake.lock"
           pr-labels: |
             dependencies
