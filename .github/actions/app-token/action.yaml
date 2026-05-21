@@ -22,13 +22,13 @@ outputs:
     value: ${{ steps.app-token.outputs.token }}
   user_name:
     description: The username of the Github App user associated with the token
-    value: ${{ steps.app-user.outputs.user-name }}
+    value: ${{ steps.app-user.outputs.user_name }}
   user_id:
     description: The user ID of the Github App user associated with the token
-    value: ${{ steps.app-user.outputs.user-id }}
+    value: ${{ steps.app-user.outputs.user_id }}
   user_email:
     description: The email of the Github App user associated with the token
-    value: ${{ steps.app-user.outputs.user-email }}
+    value: ${{ steps.app-user.outputs.user_email }}
   committer:
     description: The committer information of the Github App user associated with the token
     value: ${{ steps.app-user.outputs.committer }}
@@ -56,8 +56,8 @@ runs:
         USER_ID="$(gh api "/users/$USER_NAME" --jq .id)"
         USER_EMAIL="${USER_ID}+${USER_NAME}@users.noreply.github.com"
         {
-          echo "user-id=$USER_ID"
-          echo "user-name=$USER_NAME"
-          echo "user-email=$USER_EMAIL"
+          echo "user_id=$USER_ID"
+          echo "user_name=$USER_NAME"
+          echo "user_email=$USER_EMAIL"
           echo "committer=$USER_NAME <$USER_EMAIL>"
         } >> "$GITHUB_OUTPUT"

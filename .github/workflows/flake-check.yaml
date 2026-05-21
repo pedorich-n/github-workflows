@@ -12,16 +12,14 @@ on:
         default: ""
       app_client_id:
         description: The Github App ClientID to authenticate with. If provided, it will
-          be used to generate a token for git authentication. If not provided,
-          it will fall back to using the `git_https_token` secret for
-          authentication.
+          be used to generate a token for git authentication.
         required: false
         type: string
         default: ""
       app_owner:
         description: If provided, the token will be issued for all repositories in the
-          owner (user or organization). If not provided, the token will be issued
-          for the repository of the workflow that calls this action.
+          owner (user or organization). If not provided, the token will be
+          issued for the repository of the workflow that calls this action.
         required: false
         type: string
         default: ""
@@ -32,16 +30,9 @@ on:
         type: string
         default: ""
     secrets:
-      git_https_token:
-        required: false
-        description: Github Access Token to rewrite git URLs to use HTTPS with
-          authentication. If not provided, it will rewrite to standard HTTPS
-          URLs without authentication.
       app_private_key:
         description: The private key of the Github App, in PEM format. If provided, it
-          will be used to generate a token for git authentication. If not
-          provided, it will fall back to using the `git_https_token` secret for
-          authentication.
+          will be used to generate a token for git authentication.
         required: false
 
 jobs:
@@ -51,7 +42,7 @@ jobs:
     steps:
       - name: Get Github App info
         if: ${{ inputs.app_client_id != '' }}
-        id: app-auth
+        id: app_auth
         uses: pedorich-n/github-workflows/.github/actions/app-token@rework-flows # main
         with:
           client_id: ${{ inputs.app_client_id }}
@@ -63,7 +54,7 @@ jobs:
         uses: pedorich-n/github-workflows/.github/actions/setup-nix-job@rework-flows # main
         with:
           nix_version: ${{ inputs.nix_version }}
-          git_https_token: ${{ steps.app-auth.outputs.token || secrets.git_https_token }}
+          git_https_token: ${{ steps.app_auth.outputs.token }}
 
       - name: Nix Flake Check
         uses: pedorich-n/github-workflows/.github/actions/nix-flake-check@rework-flows # main
