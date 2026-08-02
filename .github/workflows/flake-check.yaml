@@ -51,7 +51,7 @@ jobs:
           repositories: ${{ inputs.app_repositories }}
 
       - name: Setup Nix
-        uses: pedorich-n/github-workflows/.github/actions/setup-nix-job@692bc85f75ce027e466132921917f8f9a4cc5057 # main
+        uses: pedorich-n/github-workflows/.github/actions/setup-nix-job@bce63821140336a8948710f9fcc3493865372692 # main
         with:
           nix_version: ${{ inputs.nix_version }}
           git_https_token: ${{ steps.app_auth.outputs.token }}
