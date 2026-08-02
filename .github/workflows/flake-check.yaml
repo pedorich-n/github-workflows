@@ -71,11 +71,30 @@ jobs:
           git config --local --name-only --get-regexp \
             '^http\..*\.extraheader$' || true
 
+          test -s "$HOME/.git-credentials"
+          stat --format='mode=%a size=%s bytes' "$HOME/.git-credentials"
+
           echo "Testing the exact SSH-form URL Nix uses:"
           GIT_TERMINAL_PROMPT=0 \
             git ls-remote \
               ssh://git@github.com/pedorich-n/airtable-telegram-lessons \
               HEAD
+
+      - name: Verify GitHub App token repository access
+        shell: bash
+        env:
+          GH_TOKEN: ${{ steps.app_auth.outputs.token }}
+        run: |
+          set -euo pipefail
+
+          echo "Checking direct repository visibility:"
+          gh api repos/pedorich-n/airtable-telegram-lessons \
+            --jq '"repository=" + .full_name'
+
+          echo "Checking repositories granted to this installation token:"
+          gh api --paginate installation/repositories \
+            --jq '.repositories[].full_name' |
+            grep -Fx 'pedorich-n/airtable-telegram-lessons'
 
       - name: Nix Flake Check
         uses: pedorich-n/github-workflows/.github/actions/nix-flake-check@692bc85f75ce027e466132921917f8f9a4cc5057 # main
