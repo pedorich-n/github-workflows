@@ -17,8 +17,8 @@ runs:
     - name: Rewrite SSH → HTTPS git URLs
       shell: bash
       run: |
-        git config --global url."https://github.com/".insteadOf "git@github.com:"
-        git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
+        git config --global --add url."https://github.com/".insteadOf "git@github.com:"
+        git config --global --add url."https://github.com/".insteadOf "ssh://git@github.com/"
 
     - name: Setup credential helper for token authentication
       if: ${{ inputs.git_https_token }}
