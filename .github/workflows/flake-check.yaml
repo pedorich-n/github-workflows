@@ -56,5 +56,26 @@ jobs:
           nix_version: ${{ inputs.nix_version }}
           git_https_token: ${{ steps.app_auth.outputs.token }}
 
+      - name: Verify private flake Git access
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "URL rewrites:"
+          git config --global --get-all url."https://github.com/".insteadOf || true
+
+          echo "Credential helpers:"
+          git config --show-origin --get-all credential.helper || true
+
+          echo "Checkout HTTP extraheaders (names only):"
+          git config --local --name-only --get-regexp \
+            '^http\..*\.extraheader$' || true
+
+          echo "Testing the exact SSH-form URL Nix uses:"
+          GIT_TERMINAL_PROMPT=0 \
+            git ls-remote \
+              ssh://git@github.com/pedorich-n/airtable-telegram-lessons \
+              HEAD
+
       - name: Nix Flake Check
         uses: pedorich-n/github-workflows/.github/actions/nix-flake-check@692bc85f75ce027e466132921917f8f9a4cc5057 # main
