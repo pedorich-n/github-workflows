@@ -2,7 +2,8 @@ name: Setup a job that uses Nix
 description: A set of steps to setup a Github Actions job with Nix
 inputs:
   git_https_token:
-    description: Optional Github Access Token to rewrite git URLs to use HTTPS with
+    description:
+      Optional Github Access Token to rewrite git URLs to use HTTPS with
       authentication. If not provided, it will rewrite to standard HTTPS URLs
       without authentication.
     required: false
@@ -26,8 +27,14 @@ runs:
       env:
         GIT_HTTPS_TOKEN: ${{ inputs.git_https_token }}
       run: |
-        git config --global credential.helper "store --file=$HOME/.git-credentials"
-        echo "https://x-access-token:${GIT_HTTPS_TOKEN}@github.com" > $HOME/.git-credentials
+        set -euo pipefail
+        credentials_file="$RUNNER_TEMP/github-app-git-credentials"
+
+        umask 077
+        printf 'https://x-access-token:%s@github.com/\n' "$GIT_HTTPS_TOKEN" > "$credentials_file"
+
+        git config --global --unset-all credential.helper || true
+        git config --global credential.helper "store --file=$credentials_file"
 
     - name: Checkout repository
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
