@@ -47,7 +47,7 @@ jobs:
       - name: Get Github App info
         if: ${{ inputs.app_client_id != '' }}
         id: app_auth
-        uses: pedorich-n/github-workflows/.github/actions/app-token@b05f1aba343fef1a1bbf5e0af9d722e3342552f4 # main
+        uses: pedorich-n/github-workflows/.github/actions/app-token@fixing-rewrites # main
         with:
           client_id: ${{ inputs.app_client_id }}
           private_key: ${{ secrets.app_private_key }}
@@ -64,7 +64,7 @@ jobs:
           printf '%s' "$TOKEN" | wc -c | awk '{print "App token length=" $1}'
 
       - name: Setup Nix
-        uses: pedorich-n/github-workflows/.github/actions/setup-nix-job@b05f1aba343fef1a1bbf5e0af9d722e3342552f4 # main
+        uses: pedorich-n/github-workflows/.github/actions/setup-nix-job@fixing-rewrites # main
         with:
           nix_version: ${{ inputs.nix_version }}
           git_https_token: ${{ steps.app_auth.outputs.token }}
@@ -89,4 +89,4 @@ jobs:
               HEAD
 
       - name: Nix Flake Check
-        uses: pedorich-n/github-workflows/.github/actions/nix-flake-check@b05f1aba343fef1a1bbf5e0af9d722e3342552f4 # main
+        uses: pedorich-n/github-workflows/.github/actions/nix-flake-check@fixing-rewrites # main

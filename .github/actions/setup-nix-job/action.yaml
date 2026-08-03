@@ -42,6 +42,7 @@ runs:
 
         actual_size="$(wc -c < "${credentials_file}")"
         token_len="${#GIT_HTTPS_TOKEN}"
+        echo "Credentials written: ${actual_size} bytes, token length=${token_len}, mode=$(stat --format='%a' "${credentials_file}")"
 
         git config --global --unset-all credential.helper || true
         git config --global credential.helper "store --file=$credentials_file"
