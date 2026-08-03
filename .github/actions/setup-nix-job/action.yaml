@@ -15,6 +15,17 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Debug setup-action token fingerprint
+      if: ${{ inputs.git_https_token != '' }}
+      shell: bash
+      env:
+        TOKEN: ${{ inputs.git_https_token }}
+      run: |
+        set -euo pipefail
+        printf '%s' "$TOKEN" | sha256sum | awk '{print "Setup input SHA-256=" $1}'
+        printf '%s' "$TOKEN" | wc -c | awk '{print "Setup input length=" $1}'
+
+
     - name: Rewrite SSH → HTTPS git URLs
       shell: bash
       run: |

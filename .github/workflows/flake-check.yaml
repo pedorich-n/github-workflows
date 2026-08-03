@@ -50,6 +50,15 @@ jobs:
           owner: ${{ inputs.app_owner }}
           repositories: ${{ inputs.app_repositories }}
 
+      - name: Debug App token fingerprint
+        shell: bash
+        env:
+          TOKEN: ${{ steps.app_auth.outputs.token }}
+        run: |
+          set -euo pipefail
+          printf '%s' "$TOKEN" | sha256sum | awk '{print "App token SHA-256=" $1}'
+          printf '%s' "$TOKEN" | wc -c | awk '{print "App token length=" $1}'
+
       - name: Setup Nix
         uses: pedorich-n/github-workflows/.github/actions/setup-nix-job@bce63821140336a8948710f9fcc3493865372692 # main
         with:
