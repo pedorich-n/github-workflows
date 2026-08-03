@@ -60,7 +60,7 @@ jobs:
           printf '%s' "$TOKEN" | wc -c | awk '{print "App token length=" $1}'
 
       - name: Setup Nix
-        uses: pedorich-n/github-workflows/.github/actions/setup-nix-job@bce63821140336a8948710f9fcc3493865372692 # main
+        uses: pedorich-n/github-workflows/.github/actions/setup-nix-job@dac49ab5da5ebe61bb68301696d2d5d6fdfa1901 # main
         with:
           nix_version: ${{ inputs.nix_version }}
           git_https_token: ${{ steps.app_auth.outputs.token }}
@@ -107,4 +107,4 @@ jobs:
 
 
       - name: Nix Flake Check
-        uses: pedorich-n/github-workflows/.github/actions/nix-flake-check@692bc85f75ce027e466132921917f8f9a4cc5057 # main
+        uses: pedorich-n/github-workflows/.github/actions/nix-flake-check@dac49ab5da5ebe61bb68301696d2d5d6fdfa1901 # main
