@@ -78,15 +78,6 @@ jobs:
 
           gh api repos/pedorich-n/airtable-telegram-lessons/contents --jq '.[0].name'
 
-      - name: Verify Git can fetch the private flake input
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          GIT_TERMINAL_PROMPT=0 \
-            git ls-remote \
-              ssh://git@github.com/pedorich-n/airtable-telegram-lessons \
-              HEAD
 
       - name: Nix Flake Check
         uses: pedorich-n/github-workflows/.github/actions/nix-flake-check@fixing-rewrites # main
