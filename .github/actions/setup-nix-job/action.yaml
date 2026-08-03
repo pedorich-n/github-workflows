@@ -15,17 +15,6 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Debug setup-action token fingerprint
-      if: ${{ inputs.git_https_token != '' }}
-      shell: bash
-      env:
-        TOKEN: ${{ inputs.git_https_token }}
-      run: |
-        set -euo pipefail
-        printf '%s' "$TOKEN" | sha256sum | awk '{print "Setup input SHA-256=" $1}'
-        printf '%s' "$TOKEN" | wc -c | awk '{print "Setup input length=" $1}'
-
-
     - name: Rewrite SSH → HTTPS git URLs
       shell: bash
       run: |
@@ -40,12 +29,18 @@ runs:
       run: |
         set -euo pipefail
         credentials_file="$RUNNER_TEMP/github-app-git-credentials"
-
-        umask 077
-        printf 'https://x-access-token:%s@github.com/\n' "$GIT_HTTPS_TOKEN" > "$credentials_file"
+        install -m 600 /dev/null "$credentials_file"
 
         git config --global --unset-all credential.helper || true
         git config --global credential.helper "store --file=$credentials_file"
+
+        git credential-store --file="$credentials_file" store <<EOF
+        protocol=https
+        host=github.com
+        username=x-access-token
+        password=$GIT_HTTPS_TOKEN
+
+        EOF
 
     - name: Checkout repository
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
