@@ -54,30 +54,11 @@ jobs:
           owner: ${{ inputs.app_owner }}
           repositories: ${{ inputs.app_repositories }}
 
-      - name: Debug App token fingerprint
-        shell: bash
-        env:
-          TOKEN: ${{ steps.app_auth.outputs.token }}
-        run: |
-          set -euo pipefail
-          printf '%s' "$TOKEN" | sha256sum | awk '{print "App token SHA-256=" $1}'
-          printf '%s' "$TOKEN" | wc -c | awk '{print "App token length=" $1}'
-
       - name: Setup Nix
         uses: pedorich-n/github-workflows/.github/actions/setup-nix-job@fixing-rewrites # main
         with:
           nix_version: ${{ inputs.nix_version }}
           git_https_token: ${{ steps.app_auth.outputs.token }}
-
-      - name: Verify App can read repository contents
-        shell: bash
-        env:
-          GH_TOKEN: ${{ steps.app_auth.outputs.token }}
-        run: |
-          set -euo pipefail
-
-          gh api repos/pedorich-n/airtable-telegram-lessons/contents --jq '.[0].name'
-
 
       - name: Nix Flake Check
         uses: pedorich-n/github-workflows/.github/actions/nix-flake-check@fixing-rewrites # main
