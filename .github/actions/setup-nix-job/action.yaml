@@ -2,7 +2,8 @@ name: Setup a job that uses Nix
 description: A set of steps to setup a Github Actions job with Nix
 inputs:
   git_https_token:
-    description: Optional Github Access Token to rewrite git URLs to use HTTPS with
+    description:
+      Optional Github Access Token to rewrite git URLs to use HTTPS with
       authentication. If not provided, it will rewrite to standard HTTPS URLs
       without authentication.
     required: false
@@ -17,29 +18,25 @@ runs:
     - name: Rewrite SSH → HTTPS git URLs
       shell: bash
       run: |
-        git config --global url."https://github.com/".insteadOf "git@github.com:"
-        git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
-
-    - name: Setup credential helper for token authentication
-      if: ${{ inputs.git_https_token }}
-      shell: bash
-      env:
-        GIT_HTTPS_TOKEN: ${{ inputs.git_https_token }}
-      run: |
-        git config --global credential.helper "store --file=$HOME/.git-credentials"
-        echo "https://x-access-token:${GIT_HTTPS_TOKEN}@github.com" > $HOME/.git-credentials
+        git config --global --add url."https://github.com/".insteadOf "git@github.com:"
+        git config --global --add url."https://github.com/".insteadOf "ssh://git@github.com/"
 
     - name: Checkout repository
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       with:
+        token: ${{ inputs.git_https_token || github.token }}
         submodules: recursive
+        persist-credentials: false
 
     - name: Install Nix (specific version)
       uses: nixbuild/nix-quick-install-action@9f63be77f412a248c9d9a65a4c82cf066cdf8f0c # v35
       if: ${{ inputs.nix_version != '' }}
       with:
+        github_access_token: ${{ inputs.git_https_token || github.token }}
         nix_version: ${{ inputs.nix_version }}
 
     - name: Install Nix (latest stable)
       uses: nixbuild/nix-quick-install-action@9f63be77f412a248c9d9a65a4c82cf066cdf8f0c # v35
       if: ${{ inputs.nix_version == '' }}
+      with:
+        github_access_token: ${{ inputs.git_https_token || github.token }}
