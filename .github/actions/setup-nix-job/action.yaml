@@ -15,18 +15,18 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Rewrite SSH → HTTPS git URLs
+      shell: bash
+      run: |
+        git config --global --add url."https://github.com/".insteadOf "git@github.com:"
+        git config --global --add url."https://github.com/".insteadOf "ssh://git@github.com/"
+
     - name: Checkout repository
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       with:
         token: ${{ inputs.git_https_token || github.token }}
         submodules: recursive
         persist-credentials: false
-
-    - name: Rewrite SSH → HTTPS git URLs
-      shell: bash
-      run: |
-        git config --global --add url."https://github.com/".insteadOf "git@github.com:"
-        git config --global --add url."https://github.com/".insteadOf "ssh://git@github.com/"
 
     - name: Install Nix (specific version)
       uses: nixbuild/nix-quick-install-action@9f63be77f412a248c9d9a65a4c82cf066cdf8f0c # v35
