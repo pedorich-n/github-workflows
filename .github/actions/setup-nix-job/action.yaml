@@ -108,3 +108,5 @@ runs:
     - name: Install Nix (latest stable)
       uses: nixbuild/nix-quick-install-action@9f63be77f412a248c9d9a65a4c82cf066cdf8f0c # v35
       if: ${{ inputs.nix_version == '' }}
+      with:
+        github_access_token: ${{ inputs.git_https_token || github.token }}
