@@ -1,6 +1,5 @@
 name: Run nix-update
-description: An action to run `nix-update` for given packages and create a pull
-  request if updates are found
+description: An action to run `nix-update` for given packages
 inputs:
   args:
     description: Extra arguments to pass to nix-update
@@ -10,6 +9,14 @@ inputs:
     description: A newline or comma-separated list of packages to update (e.g.
       "package1,package2")
     required: true
+
+outputs:
+  count:
+    description: Number of packages that were updated
+    value: ${{ steps.summary.outputs.count }}
+  summary:
+    description: Markdown summary of updated packages and their changes
+    value: ${{ steps.summary.outputs.summary }}
 
 runs:
   using: composite
@@ -31,7 +38,8 @@ runs:
 
           for pkg in "${packages[@]}"; do
             echo "Updating package: $pkg"
-            nix-update $ARGS --write-commit-message="${updated_packages_dir}/$pkg" "$pkg"
+            safe_pkg="${pkg//\//_}"
+            nix-update $ARGS --write-commit-message="${updated_packages_dir}/${safe_pkg}" "$pkg"
           done
         SCRIPT
 
