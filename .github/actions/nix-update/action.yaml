@@ -1,6 +1,5 @@
 name: Run nix-update
-description: An action to run `nix-update` for given packages and create a pull
-  request if updates are found
+description: An action to run `nix-update` for given packages
 inputs:
   args:
     description: Extra arguments to pass to nix-update
@@ -10,20 +9,14 @@ inputs:
     description: A newline or comma-separated list of packages to update (e.g.
       "package1,package2")
     required: true
-  token:
-    description: GitHub token for creating pull requests
-    required: false
-    default: ${{ github.token }}
-  committer:
-    description: Name and email for the git committer
-    required: false
-    default: |
-      github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
-  author:
-    description: Name and email for the git author
-    required: false
-    default: |
-      github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
+
+outputs:
+  count:
+    description: Number of packages that were updated
+    value: ${{ steps.summary.outputs.count }}
+  summary:
+    description: Markdown summary of updated packages and their changes
+    value: ${{ steps.summary.outputs.summary }}
 
 runs:
   using: composite
@@ -45,7 +38,8 @@ runs:
 
           for pkg in "${packages[@]}"; do
             echo "Updating package: $pkg"
-            nix-update $ARGS --write-commit-message="${updated_packages_dir}/$pkg" "$pkg"
+            safe_pkg="${pkg//\//_}"
+            nix-update $ARGS --write-commit-message="${updated_packages_dir}/${safe_pkg}" "$pkg"
           done
         SCRIPT
 
@@ -70,21 +64,3 @@ runs:
           done
           echo "__EOF__"
         } >> "$GITHUB_OUTPUT"
-
-    - name: Check for changes
-      id: git-check
-      shell: bash
-      run: |
-        git diff --quiet || echo "changes_detected=true" >> "$GITHUB_OUTPUT"
-
-    - name: Create pull request
-      if: steps.git-check.outputs.changes_detected
-      uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8
-      with:
-        token: ${{ inputs.token }}
-        committer: ${{ inputs.committer }}
-        author: ${{ inputs.author }}
-        commit-message: "Updated ${{ steps.summary.outputs.count }} package(s)"
-        branch: "nix-update/${{ github.run_id }}"
-        title: "Update package(s) using nix-update"
-        body: ${{ steps.summary.outputs.summary }}
