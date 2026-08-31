@@ -38,7 +38,7 @@ jobs:
       - name: Get Github App info
         if: ${{ inputs.app_client_id != '' }}
         id: app_auth
-        uses: pedorich-n/github-workflows/.github/actions/app-token@ec82000d7963db833f8eae938a52cd61cbbc979c # main
+        uses: pedorich-n/github-workflows/.github/actions/app-token@8dae1302115fad2af5d92f4e0368f727b17cd8ce # main
         with:
           client_id: ${{ inputs.app_client_id }}
           private_key: ${{ secrets.app_private_key }}
@@ -46,7 +46,7 @@ jobs:
           repositories: ${{ inputs.app_repositories }}
 
       - name: Setup job
-        uses: pedorich-n/github-workflows/.github/actions/setup-nix-job@ec82000d7963db833f8eae938a52cd61cbbc979c # main
+        uses: pedorich-n/github-workflows/.github/actions/setup-nix-job@8dae1302115fad2af5d92f4e0368f727b17cd8ce # main
         with:
           nix_version: ${{ inputs.nix_version }}
           git_https_token: ${{ steps.app_auth.outputs.token }}
