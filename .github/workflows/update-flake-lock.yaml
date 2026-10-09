@@ -53,7 +53,7 @@ jobs:
 
       - name: Update flake.lock (using Github App)
         if: ${{ steps.app_auth.outputs.token }}
-        uses: DeterminateSystems/update-flake-lock@834c491b2ece4de0bbd00d85214bb5e83b4da5c6 # v28
+        uses: DeterminateSystems/update-flake-lock@da03c0f078bc4b2c37ee4f7e072d34bf8f188bb3 # v29
         with:
           token: ${{ steps.app_auth.outputs.token }}
           branch: update_flake_lock_action
@@ -68,7 +68,7 @@ jobs:
 
       - name: Update flake.lock (without token)
         if: ${{ !steps.app_auth.outputs.token }}
-        uses: DeterminateSystems/update-flake-lock@834c491b2ece4de0bbd00d85214bb5e83b4da5c6 # v28
+        uses: DeterminateSystems/update-flake-lock@da03c0f078bc4b2c37ee4f7e072d34bf8f188bb3 # v29
         with:
           branch: update_flake_lock_action
           pr-title: "Update flake.lock"
