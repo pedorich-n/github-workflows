@@ -27,11 +27,13 @@ runs:
       env:
         ARGS: ${{ inputs.args }}
         PACKAGES: ${{ inputs.packages }}
+        NIX_UPDATE_FLAKE: >-
+          github:${{ github.action_repository }}/${{ github.action_ref || 'main' }}#nix-update
       run: |
         export updated_packages_dir="/tmp/nix-updated-packages"
         mkdir -p "$updated_packages_dir"
 
-        nix shell nixpkgs#nix-update --command bash << 'SCRIPT'
+        nix shell "$NIX_UPDATE_FLAKE" --command bash << 'SCRIPT'
           set -euo pipefail
 
           IFS=$'\n' readarray -t packages < <(printf '%s' "${PACKAGES//,/$'\n'}" | xargs -n1)
